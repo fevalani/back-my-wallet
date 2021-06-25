@@ -18,23 +18,13 @@ export default async function validateLogIn({ password, email }, connection) {
     userId = user.rows[0].id;
   }
 
-  //   const idExists = await connection.query(
-  //     `SELECT * FROM logged_users WHERE "userId" = $1`,
-  //     [userId]
-  //   );
-
-  //   if (idExists.rows.length !== 0) {
-  //     return { type: false, status: 409 };
-  //   }
-
-  if (!bcrypt.compareSync(password, user.rows[0].password)) {
-    return { type: false, status: 401 };
-  }
-
   if (schema.validate({ password, email })?.error === undefined) {
-    const loggedPassword = user.rows[0].password;
-    const name = user.rows[0].name;
-    return { type: true, status: 201, userId, name };
+    if (!bcrypt.compareSync(password, user.rows[0].password)) {
+      return { type: false, status: 401 };
+    } else {
+      const name = user.rows[0].name;
+      return { type: true, status: 200, userId, name };
+    }
   } else {
     return { type: false, status: 400 };
   }

@@ -47,3 +47,44 @@ describe("POST /mywallet/signup", () => {
     expect(result.status).toEqual(400);
   });
 });
+
+describe("GET /mywallet/login", () => {
+  it("returns status 200 for created user", async () => {
+    const body = {
+      name: "TesteUser",
+      email: "teste@user.com",
+      password: "123456789",
+    };
+    const login = { email: "teste@user.com", password: "123456789" };
+    await supertest(app).post("/mywallet/signup").send(body);
+    const result = await supertest(app).post("/mywallet/login").send(login);
+    expect(result.status).toEqual(200);
+  });
+  it("returns status 400 for invalid params", async () => {
+    const body = {
+      name: "TesteUser",
+      email: "teste@user.com",
+      password: "123456789",
+    };
+    const login = { email: "teste@user.com", password: "   " };
+    await supertest(app).post("/mywallet/signup").send(body);
+    const result = await supertest(app).post("/mywallet/login").send(login);
+    expect(result.status).toEqual(400);
+  });
+  it("returns status 401 for wrong password", async () => {
+    const body = {
+      name: "TesteUser",
+      email: "teste@user.com",
+      password: "123456789",
+    };
+    const login = { email: "teste@user.com", password: "1234567890" };
+    await supertest(app).post("/mywallet/signup").send(body);
+    const result = await supertest(app).post("/mywallet/login").send(login);
+    expect(result.status).toEqual(401);
+  });
+  it("returns status 403 for not sign-up user", async () => {
+    const login = { email: "teste@user.com", password: "1234567890" };
+    const result = await supertest(app).post("/mywallet/login").send(login);
+    expect(result.status).toEqual(403);
+  });
+});
