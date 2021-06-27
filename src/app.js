@@ -66,7 +66,8 @@ app.get("/mywallets/finances", async (req, res) => {
     );
     if (tokenExists.rows.length !== 0) {
       const finances = await connection.query(
-        `SELECT type, description, date, value FROM finance`
+        `SELECT type, description, date, value FROM finance WHERE "userId" = $1`,
+        [tokenExists.rows[0].userId]
       );
       res.send(finances.rows);
     } else {
